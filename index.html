@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Guia visual sobre tabelas de hash: o que são, para que servem, como funcionam e um exemplo passo a passo." />
+  <title>Tabelas de Hash — Guia Visual</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#inicio" aria-label="Voltar ao início">
+        <span class="brand-mark" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+        </span>
+        <span>hash<span class="brand-slash">/</span>tables</span>
+      </a>
+      <nav class="nav" aria-label="Navegação principal">
+        <a href="#estrutura">Estrutura</a>
+        <a href="#serve">Para que serve</a>
+        <a href="#funciona">Como funciona</a>
+        <a href="#exemplo">Exemplo</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Ativar tema claro" aria-pressed="false" title="Alternar tema claro/escuro">
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8Z" /></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
+        </button>
+        <a class="header-cta" href="#exemplo">Ver exemplo <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero" id="inicio">
+      <div class="container hero-inner">
+        <div class="hero-copy reveal">
+          <div class="eyebrow"><span class="pulse"></span> Estruturas de dados · guia visual</div>
+          <h1>Tabelas de <em>Hash</em></h1>
+          <p class="lead">
+            Uma forma inteligente de guardar e encontrar informações: transforme uma chave
+            em um endereço e acesse o dado quase que instantaneamente.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#estrutura">Começar a ler <span aria-hidden="true">↓</span></a>
+            <a class="btn btn-ghost" href="#exemplo">Ver exemplo</a>
+          </div>
+          <div class="hero-stats">
+            <div><strong>O(1)</strong><span>busca média</span></div>
+            <div><strong>chave → índice</strong><span>ideia central</span></div>
+            <div><strong>colisões</strong><span>caso tratado</span></div>
+          </div>
+        </div>
+        <div class="hero-visual reveal" aria-hidden="true">
+          <div class="visual-frame">
+            <div class="visual-top"><span class="mini-dot"></span><span class="mini-dot"></span><span class="mini-dot"></span><span class="visual-title">memoria.csv</span></div>
+            <div class="visual-grid" id="heroGrid"></div>
+            <div class="visual-caption"><span class="accent-text">hash("ana")</span> → posição 04 → <span class="accent-text">"Ana Souza"</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ESTRUTURA -->
+    <section class="section" id="estrutura">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-number">01 / ESTRUTURA</span>
+          <h2>O que é a estrutura?</h2>
+          <p>
+            A tabela de hash (ou <strong>tabela de dispersão</strong>) é uma estrutura de dados que
+            associa <strong>chaves</strong> a <strong>valores</strong>. Ela usa uma função matemática para
+            converter cada chave em um índice do vetor, permitindo localizar o valor sem percorrer
+            toda a lista.
+          </p>
+        </div>
+
+        <div class="split">
+          <div class="split-text reveal">
+            <h3>Pense como um armário de chaves</h3>
+            <p>
+              Imagine um armário com várias gavetas numeradas. Em vez de procurar em todas, você
+              usa a chave para descobrir exatamente qual gaveta abrir. Se duas chaves apontarem para
+              a mesma gaveta, elas ficam enfileiradas dentro dela — é o que chamamos de
+              <strong>colisão</strong>.
+            </p>
+            <div class="callout">
+              <span class="callout-icon" aria-hidden="true">i</span>
+              <p><strong>Componentes principais:</strong> o vetor de posições (buckets), a função hash,
+                os pares chave-valor e a estratégia de tratamento de colisões.</p>
+            </div>
+          </div>
+
+          <div class="diagram reveal" aria-label="Diagrama de uma tabela de hash com encadeamento">
+            <div class="diagram-head"><span class="mini-dot"></span> vetor interno · 8 posições</div>
+            <div class="diagram-rows">
+              <div class="diagram-row"><span class="idx">00</span><span class="slot empty">vazio</span></div>
+              <div class="diagram-row"><span class="idx">01</span><span class="slot">"nome"</span><span class="link">→</span><span class="slot value">Ana Souza</span></div>
+              <div class="diagram-row"><span class="idx">02</span><span class="slot">"turno"</span><span class="link">→</span><span class="slot value">Noite</span></div>
+              <div class="diagram-row"><span class="idx">03</span><span class="slot empty">vazio</span></div>
+              <div class="diagram-row"><span class="idx">04</span><span class="slot">"curso"</span><span class="link">→</span><span class="slot value">ADS</span><span class="link">→</span><span class="slot">"cidade"</span><span class="link">→</span><span class="slot value">Recife</span></div>
+              <div class="diagram-row"><span class="idx">05</span><span class="slot empty">vazio</span></div>
+              <div class="diagram-row"><span class="idx">06</span><span class="slot empty">vazio</span></div>
+              <div class="diagram-row"><span class="idx">07</span><span class="slot">"idade"</span><span class="link">→</span><span class="slot value">23</span></div>
+            </div>
+            <div class="diagram-legend">
+              <span><i class="legend-swatch key"></i> chave</span>
+              <span><i class="legend-swatch val"></i> valor</span>
+              <span><i class="legend-swatch col"></i> colisão encadeada</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cards-3">
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">[ ]</div>
+            <h3>Vetor de buckets</h3>
+            <p>Array com posições fixas. Cada posição guarda zero, um ou mais pares chave-valor.</p>
+          </article>
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">f(x)</div>
+            <h3>Função hash</h3>
+            <p>Recebe a chave e devolve um índice. Boas funções distribuem as chaves de forma uniforme.</p>
+          </article>
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">⤳</div>
+            <h3>Tratamento de colisão</h3>
+            <p>Quando dois índices coincidem, usa-se encadeamento ou sondagem para resolver o conflito.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- PARA QUE SERVE -->
+    <section class="section section-alt" id="serve">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-number">02 / APLICAÇÕES</span>
+          <h2>Para que serve?</h2>
+          <p>
+            Sempre que você precisa de acesso rápido por uma chave, a tabela de hash aparece.
+            Ela está por trás de muitas estruturas e sistemas do dia a dia.
+          </p>
+        </div>
+        <div class="cards-3 use-cards">
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">{ }</div>
+            <h3>Dicionários e mapas</h3>
+            <p>Objetos em JavaScript, dict em Python e HashMap em Java são tabelas de hash por baixo.</p>
+          </article>
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">⚡</div>
+            <h3>Cache</h3>
+            <p>Guarda resultados já calculados e os recupera rapidamente pelo identificador da consulta.</p>
+          </article>
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">⌕</div>
+            <h3>Índices de busca</h3>
+            <p>Acelera consultas em bancos de dados e mecanismos de busca sem varrer todos os registros.</p>
+          </article>
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">#</div>
+            <h3>Contagem de frequência</h3>
+            <p>Quantas vezes cada palavra aparece em um texto? A chave é a palavra, o valor é o contador.</p>
+          </article>
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">◈</div>
+            <h3>Conjuntos</h3>
+            <p>Sets usam hash para responder depressa se um elemento existe e evitar duplicatas.</p>
+          </article>
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">⇄</div>
+            <h3>Detecção de duplicatas</h3>
+            <p>Compare registros já vistos em tempo linear, útil em listas grandes e logs.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMO FUNCIONA -->
+    <section class="section" id="funciona">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-number">03 / FUNCIONAMENTO</span>
+          <h2>Como funciona?</h2>
+          <p>O fluxo é simples: converter a chave, encontrar a posição, tratar colisões e armazenar o par.</p>
+        </div>
+
+        <div class="steps">
+          <article class="step reveal">
+            <span class="step-num">01</span>
+            <h3>Receba a chave</h3>
+            <p>Toda operação começa pela chave: <code>"nome"</code>, <code>42</code>, <code>user_17</code>...</p>
+          </article>
+          <article class="step reveal">
+            <span class="step-num">02</span>
+            <h3>Aplique a função hash</h3>
+            <p>A função transforma a chave em um número, depois limita esse número ao tamanho do vetor.</p>
+          </article>
+          <article class="step reveal">
+            <span class="step-num">03</span>
+            <h3>Resolva colisões</h3>
+            <p>Se a posição estiver ocupada por outra chave, encadeie ou sondagem até encontrar espaço.</p>
+          </article>
+          <article class="step reveal">
+            <span class="step-num">04</span>
+            <h3>Guarde ou recupere</h3>
+            <p>Insira o par na posição calculada — ou leia o valor armazenado na busca.</p>
+          </article>
+        </div>
+
+        <div class="formula reveal">
+          <div class="formula-label">a conta por trás da mágica</div>
+          <div class="formula-code">índice = hash(chave) <span>MOD</span> tamanho_do_vetor</div>
+          <p>
+            Exemplo com 8 posições: se <code>hash("curso") = 27356</code>, então
+            <code>27356 % 8 = 4</code> e o par vai para a posição <strong>04</strong>.
+          </p>
+        </div>
+
+        <div class="complexity reveal">
+          <div class="complexity-intro">
+            <h3>Custo das operações</h3>
+            <p>Com uma boa função hash e poucas colisões, o acesso é praticamente constante. No pior caso, todas as chaves caem na mesma posição e a busca vira linear.</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Operação</th><th>Média</th><th>Pior caso</th><th>Observação</th></tr></thead>
+              <tbody>
+                <tr><td>Inserir</td><td><span class="tag good">O(1)</span></td><td><span class="tag warn">O(n)</span></td><td>colisões aumentam o custo</td></tr>
+                <tr><td>Buscar</td><td><span class="tag good">O(1)</span></td><td><span class="tag warn">O(n)</span></td><td>percorre a lista da posição</td></tr>
+                <tr><td>Remover</td><td><span class="tag good">O(1)</span></td><td><span class="tag warn">O(n)</span></td><td>primeiro é preciso encontrar</td></tr>
+                <tr><td>Espaço</td><td><span class="tag neutral">O(n)</span></td><td><span class="tag neutral">O(n)</span></td><td>n é o número de entradas</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXEMPLO -->
+    <section class="section section-alt" id="exemplo">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-number">04 / EXEMPLO</span>
+          <h2>Exemplo passo a passo</h2>
+          <p>
+            Veja como uma chave se transforma em uma posição do vetor — e o que acontece
+            quando duas chaves chegam ao mesmo lugar.
+          </p>
+        </div>
+
+        <div class="example-grid reveal">
+          <div class="example-panel">
+            <div class="panel-head"><span class="mini-dot"></span> o caminho da chave</div>
+            <ol class="example-list">
+              <li>
+                <span class="example-num">1</span>
+                <div><strong>Escolha o par</strong><code>chave = "nome"</code><code>valor = "Ana Souza"</code></div>
+              </li>
+              <li>
+                <span class="example-num">2</span>
+                <div><strong>Calcule o hash</strong><code>hash("nome") = 87161</code></div>
+              </li>
+              <li>
+                <span class="example-num">3</span>
+                <div><strong>Reduza ao tamanho do vetor</strong><code>87161 % 8 = 1</code></div>
+              </li>
+              <li>
+                <span class="example-num">4</span>
+                <div><strong>Guarde no bucket 01</strong><p>Se outra chave também cair aqui, ela é encadeada na mesma posição.</p></div>
+              </li>
+            </ol>
+          </div>
+
+          <div class="example-panel">
+            <div class="panel-head"><span class="mini-dot"></span> resultado na tabela · 8 buckets</div>
+            <div class="buckets">
+              <div class="bucket-row"><span class="bucket-index">00</span><span class="chain"><span class="empty-bucket">vazio</span></span></div>
+              <div class="bucket-row is-active"><span class="bucket-index">01</span><span class="chain"><span class="node hit"><span class="k">nome</span><span class="sep">:</span><span class="v">Ana Souza</span></span></span></div>
+              <div class="bucket-row"><span class="bucket-index">02</span><span class="chain"><span class="node"><span class="k">turno</span><span class="sep">:</span><span class="v">Noite</span></span></span></div>
+              <div class="bucket-row"><span class="bucket-index">03</span><span class="chain"><span class="empty-bucket">vazio</span></span></div>
+              <div class="bucket-row"><span class="bucket-index">04</span><span class="chain"><span class="node collision"><span class="k">curso</span><span class="sep">:</span><span class="v">ADS</span></span><span class="chain-arrow">→</span><span class="node collision"><span class="k">cidade</span><span class="sep">:</span><span class="v">Recife</span></span></span></div>
+              <div class="bucket-row"><span class="bucket-index">05</span><span class="chain"><span class="empty-bucket">vazio</span></span></div>
+              <div class="bucket-row"><span class="bucket-index">06</span><span class="chain"><span class="empty-bucket">vazio</span></span></div>
+              <div class="bucket-row"><span class="bucket-index">07</span><span class="chain"><span class="node"><span class="k">idade</span><span class="sep">:</span><span class="v">23</span></span></span></div>
+            </div>
+            <div class="demo-legend">
+              <span><i class="legend-swatch key"></i> chave</span>
+              <span><i class="legend-swatch val"></i> valor</span>
+              <span><i class="legend-swatch hit"></i> posição calculada</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-block reveal">
+          <div class="code-head"><span class="mini-dot"></span><span class="mini-dot"></span><span class="mini-dot"></span><span>hash-table.js</span></div>
+<pre><code><span class="c-kw">class</span> TabelaHash {
+  <span class="c-kw">constructor</span>(tamanho = <span class="c-num">8</span>) {
+    <span class="c-kw">this</span>.buckets = Array.from({ length: tamanho }, () =&gt; []);
+  }
+
+  <span class="c-fn">hash</span>(chave) {
+    <span class="c-kw">let</span> h = <span class="c-num">0</span>;
+    <span class="c-kw">for</span> (<span class="c-kw">const</span> c <span class="c-kw">of</span> chave) {
+      h = (h * <span class="c-num">31</span> + c.charCodeAt(<span class="c-num">0</span>)) % <span class="c-num">100000</span>;
+    }
+    <span class="c-kw">return</span> h % <span class="c-kw">this</span>.buckets.length;
+  }
+
+  <span class="c-fn">inserir</span>(chave, valor) {
+    <span class="c-kw">const</span> i = <span class="c-kw">this</span>.hash(chave);
+    <span class="c-kw">const</span> par = <span class="c-kw">this</span>.buckets[i].find(p =&gt; p[<span class="c-num">0</span>] === chave);
+    <span class="c-kw">if</span> (par) par[<span class="c-num">1</span>] = valor;          <span class="c-com">// atualiza</span>
+    <span class="c-kw">else</span> <span class="c-kw">this</span>.buckets[i].push([chave, valor]); <span class="c-com">// colisão → encadeamento</span>
+  }
+
+  <span class="c-fn">buscar</span>(chave) {
+    <span class="c-kw">const</span> bucket = <span class="c-kw">this</span>.buckets[<span class="c-kw">this</span>.hash(chave)];
+    <span class="c-kw">return</span> bucket.find(p =&gt; p[<span class="c-num">0</span>] === chave)?.[<span class="c-num">1</span>] ?? <span class="c-kw">null</span>;
+  }
+}</code></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <span class="footer-brand">hash<span class="brand-slash">/</span>tables</span>
+        <p>Um guia visual sobre estruturas de dados.</p>
+      </div>
+      <a href="#inicio">Voltar ao topo ↑</a>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
